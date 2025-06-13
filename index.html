@@ -29,8 +29,10 @@
       padding: 15px;
       text-align: center;
     }
-    .card img {
-      max-width: 100%;
+    .card iframe {
+      width: 100%;
+      height: 200px;
+      border: none;
       border-radius: 8px;
     }
     .card button {
@@ -85,9 +87,8 @@
       card.className = "card";
 
       card.innerHTML = `
-        <img src="${video.capa}" alt="${video.titulo}">
         <h3>${video.titulo}</h3>
-        <button onclick="window.open('https://youtube.com/watch?v=${video.id}', '_blank')">Assistir</button>
+        <iframe src="https://www.youtube.com/embed/${video.id}" allowfullscreen></iframe>
         <br/><br/>
         <button onclick="marcarAssistido('${assistidoKey}', this)">✅ Marcar como assistido</button>
         <p id="${assistidoKey}_status" class="assistido" style="display:${assistido ? 'block' : 'none'}">&#10004; Assistido</p>
