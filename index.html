@@ -22,19 +22,19 @@
   </div>
 
   <!-- Firebase + lógica ------------------------------------------------>
-  <script type="module">
-    /* 1) IMPORTS – SDK 11.27.0 */
-    import { initializeApp }               from 'https://www.gstatic.com/firebasejs/11.27.0/firebase-app.js';
-    import {
-      getAuth,
-      setPersistence, browserLocalPersistence,
-      signInWithEmailAndPassword,
-      createUserWithEmailAndPassword
-    } from 'https://www.gstatic.com/firebasejs/11.27.0/firebase-auth.js';
-    import {
-      initializeFirestore,
-      doc, setDoc
-    } from 'https://www.gstatic.com/firebasejs/11.27.0/firebase-firestore.js';
+ <script type="module">
+  import { initializeApp } from
+    'https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js';
+  import {
+    getAuth,
+    setPersistence, browserLocalPersistence,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword
+  } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
+  import {
+    initializeFirestore,
+    doc, setDoc
+  } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js';
 
     /* 2) CONFIG DO SEU PROJETO (os mesmos dados que já usava) */
     const firebaseConfig = {
