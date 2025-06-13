@@ -1,4 +1,3 @@
-```css
 /* Reset e fonte */
 * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
 body {
@@ -28,4 +27,3 @@ body {
 }
 .outline:hover { background:#f4511e; color:#fff; }
 .error { color:red; font-size:0.9rem; margin-top:8px; }
-```
