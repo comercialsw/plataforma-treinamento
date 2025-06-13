@@ -9,6 +9,7 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       background-color: #f5f6fa;
+      display: flex;
     }
     header {
       background-color: #ffffff;
@@ -23,6 +24,35 @@
       color: #2c3e50;
       margin-top: 5px;
       font-size: 1.5em;
+    }
+    .sidebar {
+      width: 250px;
+      background-color: #ffffff;
+      border-right: 1px solid #ddd;
+      padding: 20px;
+      height: 100vh;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+    }
+    .sidebar h3 {
+      color: #f4511e;
+      margin-bottom: 10px;
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+    .sidebar li {
+      margin-bottom: 10px;
+      cursor: pointer;
+      color: #2c3e50;
+    }
+    .sidebar li:hover {
+      color: #f4511e;
+    }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
     .container {
       display: grid;
@@ -60,23 +90,55 @@
       color: green;
       font-weight: bold;
     }
-    @media (max-width: 600px) {
-      .container {
-        grid-template-columns: 1fr;
-        padding: 10px;
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
       }
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="logo-smartway.jpg" alt="Logo SmartWay">
-    <h1>Plataforma de Treinamentos</h1>
-    <p>Bem-vindo(a), colaborador SmartWay!</p>
-  </header>
+  <div class="sidebar">
+    <h3>Categorias</h3>
+    <ul>
+      <li onclick="filtrarCategoria('Apresentação Modelos')">Apresentação Modelos (27)</li>
+      <li onclick="filtrarCategoria('Dicas Smartway')">Dicas Smartway (35)</li>
+      <li onclick="filtrarCategoria('Dúvidas Recorrentes')">Dúvidas Recorrentes (11)</li>
+      <li onclick="filtrarCategoria('Power 600w - Apresentação')">Power 600w - Apresentação (2)</li>
+      <li onclick="filtrarCategoria('Patinete 1500w - Apresentação')">Patinete 1500w - Apresentação (2)</li>
+      <li onclick="filtrarCategoria('Uper 100w - Apresentação')">Uper 100w - Apresentação (4)</li>
+      <li onclick="filtrarCategoria('Street 350w - Apresentação')">Street 350w - Apresentação (2)</li>
+      <li onclick="filtrarCategoria('Wasp 500w - Apresentação')">Wasp 500w - Apresentação (7)</li>
+      <li onclick="filtrarCategoria('Austin 100ww - Apresentação')">Austin 100ww - Apresentação (3)</li>
+      <li onclick="filtrarCategoria('Turbo 500w - Apresentação')">Turbo 500w - Apresentação (1)</li>
+      <li onclick="filtrarCategoria('Evoltution 1000w - Montagem')">Evoltution 1000w - Montagem (3)</li>
+      <li onclick="filtrarCategoria('Confort 500w - Apresentação')">Confort 500w - Apresentação (9)</li>
+      <li onclick="filtrarCategoria('Family 500w - Apresentação')">Family 500w - Apresentação (5)</li>
+      <li onclick="filtrarCategoria('City 350w Apresentação')">City 350w Apresentação (12)</li>
+      <li onclick="filtrarCategoria('Power 600w - Montagem')">Power 600w - Montagem (3)</li>
+      <li onclick="filtrarCategoria('Family 500w - Montagem')">Family 500w - Montagem (3)</li>
+      <li onclick="filtrarCategoria('Lite 350w - Montagem')">Lite 350w - Montagem (5)</li>
+      <li onclick="filtrarCategoria('City 350w - Montagem')">City 350w - Montagem (17)</li>
+      <li onclick="filtrarCategoria('Lite 350w - Apresentação')">Lite 350w - Apresentação (6)</li>
+    </ul>
+  </div>
 
-  <div class="container" id="video-container">
-    <!-- Os vídeos serão inseridos aqui -->
+  <div class="main">
+    <header>
+      <img src="logo-smartway.jpg" alt="Logo SmartWay">
+      <h1>Plataforma de Treinamentos</h1>
+      <p>Bem-vindo(a), colaborador SmartWay!</p>
+    </header>
+
+    <div class="container" id="video-container">
+      <!-- Os vídeos serão inseridos aqui -->
+    </div>
   </div>
 
   <script>
@@ -84,39 +146,48 @@
       {
         id: "XxVg_s8xAms",
         titulo: "Treinamento de Segurança",
-        capa: "https://img.youtube.com/vi/XxVg_s8xAms/0.jpg"
+        categoria: "Apresentação Modelos"
       },
       {
         id: "dQw4w9WgXcQ",
         titulo: "Boas Práticas no Escritório",
-        capa: "https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg"
+        categoria: "Dicas Smartway"
       }
     ];
 
     const container = document.getElementById("video-container");
 
-    videos.forEach((video, index) => {
-      const assistidoKey = `assistido_${video.id}`;
-      const assistido = localStorage.getItem(assistidoKey);
+    function renderizarVideos(filtrar = null) {
+      container.innerHTML = "";
+      videos.filter(v => !filtrar || v.categoria === filtrar).forEach((video) => {
+        const assistidoKey = `assistido_${video.id}`;
+        const assistido = localStorage.getItem(assistidoKey);
 
-      const card = document.createElement("div");
-      card.className = "card";
+        const card = document.createElement("div");
+        card.className = "card";
 
-      card.innerHTML = `
-        <h3>${video.titulo}</h3>
-        <iframe src="https://www.youtube.com/embed/${video.id}" allowfullscreen></iframe>
-        <br/><br/>
-        <button onclick="marcarAssistido('${assistidoKey}', this)">✅ Marcar como assistido</button>
-        <p id="${assistidoKey}_status" class="assistido" style="display:${assistido ? 'block' : 'none'}">✔ Assistido</p>
-      `;
+        card.innerHTML = `
+          <h3>${video.titulo}</h3>
+          <iframe src="https://www.youtube.com/embed/${video.id}" allowfullscreen></iframe>
+          <br/><br/>
+          <button onclick="marcarAssistido('${assistidoKey}', this)">✅ Marcar como assistido</button>
+          <p id="${assistidoKey}_status" class="assistido" style="display:${assistido ? 'block' : 'none'}">✔ Assistido</p>
+        `;
 
-      container.appendChild(card);
-    });
+        container.appendChild(card);
+      });
+    }
 
     function marcarAssistido(chave, botao) {
       localStorage.setItem(chave, "true");
       document.getElementById(chave + "_status").style.display = "block";
     }
+
+    function filtrarCategoria(nomeCategoria) {
+      renderizarVideos(nomeCategoria);
+    }
+
+    renderizarVideos();
   </script>
 </body>
 </html>
