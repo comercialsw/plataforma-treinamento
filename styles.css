@@ -1,79 +1,40 @@
-```css
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f5f6fa;
+/* Reset básico */
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,Arial,Helvetica,sans-serif;}
+
+body{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;background:#f5f6fa;
 }
-.login-container {
-  max-width: 400px;
-  margin: 10vh auto;
-  background: white;
-  padding: 2em;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  text-align: center;
-  border-radius: 10px;
+
+.login-container{
+  width: 320px; background:#fff; padding:32px 24px;
+  border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,.06);
+  text-align:center;
 }
-.logo {
-  width: 150px;
-  margin-bottom: 20px;
+
+.logo{ width:160px; margin-bottom:24px; }
+
+.login-container h2{
+  font-size:1.4rem; color:#222; margin-bottom:24px;
 }
-input {
-  display: block;
-  width: 100%;
-  margin: 10px 0;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+
+.login-container input{
+  width:100%; padding:12px 14px; font-size:1rem;
+  border:1px solid #ddd; border-radius:6px; margin:8px 0;
 }
-.login-container button {
-  display: block;
-  width: 100%;
-  margin: 10px 0;
-  background-color: #f4511e;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
+
+button{
+  width:100%; padding:12px 0; font-size:1rem; cursor:pointer;
+  border:none; border-radius:6px; margin:10px 0;
+  background:#f4511e; color:#fff; transition:.2s;
 }
-.login-container .btn-secundario {
-  background-color: #ecf0f1;
-  color: #2c3e50;
+
+button:hover{background:#d84315;}
+
+button.outline{
+  background:#fff; color:#f4511e; border:2px solid #f4511e;
 }
-.login-container .btn-secundario:hover {
-  background-color: #d0d3d4;
+
+button.outline:hover{
+  background:#f4511e; color:#fff;
 }
-.erro {
-  color: red;
-  margin-top: 10px;
-}
-.topbar {
-  background-color: white;
-  padding: 10px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-.logo-topo {
-  height: 40px;
-}
-.video-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  padding: 20px;
-  gap: 20px;
-}
-.video-card {
-  background: white;
-  padding: 10px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-iframe {
-  width: 100%;
-  border: none;
-  border-radius: 10px;
-}
-```
