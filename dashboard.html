@@ -17,9 +17,89 @@
   </main>
 
   <script type="module">
-    /* Mesma lógica de autenticação e renderização de vídeos */
-    /* Se não estiver logado, redireciona para index.html */
-    /* Mantém progresso no Firestore, filtros e marcações */
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
+    import { getFirestore, doc, getDoc, updateDoc, arrayUnion } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey:            'AIzaSyCTJ1qxAmxW8tksXBi8hFLchSnuvSAYQfY',
+      authDomain:        'smartway-treinamentos.firebaseapp.com',
+      projectId:         'smartway-treinamentos',
+      storageBucket:     'smartway-treinamentos.appspot.com',
+      messagingSenderId: '389500401009',
+      appId:             '1:389500401009:web:22182df458fc133cc072d0'
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    const videos = [
+      { id: 'IbthtipprPs', titulo: 'Segurança', categoria: 'Apresentação Modelos' },
+      { id: '4dkCJjV0d6Y', titulo: 'Dicas', categoria: 'Dicas Smartway' }
+    ];
+
+    const container       = document.getElementById('video-container');
+    const categoriaSelect = document.getElementById('categoriaSelect');
+    const btnLogout       = document.getElementById('btnLogout');
+    let userUID          = null;
+    let assistidos       = [];
+
+    // Checa autenticação e carrega dados
+    onAuthStateChanged(auth, async user => {
+      if (!user) {
+        window.location.replace('index.html');
+        return;
+      }
+      userUID = user.uid;
+      // Carrega progresso
+      const ref = doc(db, 'progresso', userUID);
+      const snap = await getDoc(ref);
+      assistidos = snap.exists() ? snap.data().assistidos : [];
+
+      // Popula categorias
+      const categorias = [...new Set(videos.map(v => v.categoria))];
+      categorias.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        categoriaSelect.appendChild(opt);
+      });
+      // Filtra ao mudar
+      categoriaSelect.addEventListener('change', () => render(videos.filter(v => v.categoria === categoriaSelect.value)));
+
+      // Logout
+      btnLogout.addEventListener('click', () => signOut(auth).then(() => window.location.replace('index.html')));
+
+      // Exibe todos inicialmente
+      render(videos);
+    });
+
+    // Função de renderização
+    function render(list) {
+      container.innerHTML = '';
+      list.forEach(v => {
+        const visto = assistidos.includes(v.id);
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.innerHTML = `
+          <h3>${v.titulo}</h3>
+          <iframe src="https://www.youtube.com/embed/${v.id}" allowfullscreen></iframe>
+          <button ${visto ? 'disabled' : ''} onclick="marcar('${v.id}', this)">
+            ${visto ? '✔ Assistido' : '✅ Marcar como assistido'}
+          </button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Marca vídeo e atualiza Firestore
+    window.marcar = async (id, btn) => {
+      const ref = doc(db, 'progresso', userUID);
+      await updateDoc(ref, { assistidos: arrayUnion(id) });
+      btn.textContent = '✔ Assistido';
+      btn.disabled = true;
+    };
   </script>
 </body>
 </html>
