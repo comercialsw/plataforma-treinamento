@@ -1,24 +1,97 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard - SmartWay</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="topbar">
-    <img src="logo-smartway.jpg" alt="Logo" class="logo-topo">
+    <img src="logo-smartway.jpg" alt="Logo" class="logo-topo" />
     <select id="categoriaSelect"></select>
     <button id="btnLogout">Sair</button>
   </header>
-
   <main>
     <div id="video-container" class="video-container"></div>
   </main>
 
-  <script type="module" src="firebase-init.js"></script>
-  <script type="module" src="app.js"></script>
-  <script type="module" src="videos.js"></script>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
+    import { getFirestore, doc, getDoc, updateDoc, arrayUnion } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js';
+
+    // Mesma config do index
+    const firebaseConfig = {
+      apiKey:            'AIzaSyCTJ1qxAmxW8tksXBi8hFLchSnuvSAYQfY',
+      authDomain:        'smartway-treinamentos.firebaseapp.com',
+      projectId:         'smartway-treinamentos',
+      storageBucket:     'smartway-treinamentos.appspot.com',
+      messagingSenderId: '389500401009',
+      appId:             '1:389500401009:web:22182df458fc133cc072d0'
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    const videos = [
+      { id: 'XxVg_s8xAms', titulo: 'Segurança', categoria: 'Apresentação Modelos' },
+      { id: 'dQw4w9WgXcQ', titulo: 'Dicas', categoria: 'Dicas Smartway' }
+    ];
+
+    const container       = document.getElementById('video-container');
+    const categoriaSelect = document.getElementById('categoriaSelect');
+    const btnLogout       = document.getElementById('btnLogout');
+    let userUID          = null;
+    let assistidos       = [];
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) {
+        window.location.replace('index.html');
+        return;
+      }
+      userUID = user.uid;
+      // Carrega progresso
+      const ref = doc(db, 'progresso', userUID);
+      const snap = await getDoc(ref);
+      assistidos = snap.exists() ? snap.data().assistidos : [];
+
+      // Popula categorias
+      [...new Set(videos.map(v => v.categoria))]
+        .forEach(c => categoriaSelect.appendChild(new Option(c, c)));
+      categoriaSelect.addEventListener('change', () => render(videos.filter(v => v.categoria === categoriaSelect.value)));
+
+      // Logout
+      btnLogout.addEventListener('click', () => signOut(auth));
+
+      // Exibir todos por padrão
+      render(videos);
+    });
+
+    function render(list) {
+      container.innerHTML = '';
+      list.forEach(v => {
+        const visto = assistidos.includes(v.id);
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.innerHTML = `
+          <h3>${v.titulo}</h3>
+          <iframe src="https://www.youtube.com/embed/${v.id}" allowfullscreen></iframe>
+          <button ${visto ? 'disabled' : ''} onclick="mark('${v.id}', this)">
+            ${visto ? '✔ Assistido' : '✅ Marcar como assistido'}
+          </button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    window.mark = async (id, btn) => {
+      const ref = doc(db, 'progresso', userUID);
+      await updateDoc(ref, { assistidos: arrayUnion(id) });
+      btn.textContent = '✔ Assistido';
+      btn.disabled = true;
+    };
+  </script>
 </body>
 </html>
