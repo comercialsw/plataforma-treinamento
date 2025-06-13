@@ -1,60 +1,58 @@
-```javascript
+/*  app.js  */
 import { auth, db } from './firebase-init.js';
 import {
+  setPersistence,
+  browserLocalPersistence,
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut
+  createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Função de login
-async function login() {
-  const email = document.getElementById('email').value;
-  const senha = document.getElementById('senha').value;
-  const erro = document.getElementById('erro');
-  try {
-    await signInWithEmailAndPassword(auth, email, senha);
-    window.location.href = 'dashboard.html';
-  } catch (e) {
-    erro.innerText = 'Credenciais inválidas';
-  }
-}
+import {
+  doc, setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Função de registro
-async function registrar() {
-  const email = document.getElementById('email').value;
-  const senha = document.getElementById('senha').value;
-  const erro = document.getElementById('erro');
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
-    const uid = userCredential.user.uid;
-    await setDoc(doc(db, 'progresso', uid), {
-      email,
-      assistidos: [],
-      categorias_concluidas: [],
-      certificado_emitido: false,
-      data_certificado: null
-    });
-    window.location.href = 'dashboard.html';
-  } catch (e) {
-    erro.innerText = 'Erro ao registrar: ' + e.message;
-  }
-}
-
-// Função de logout
-function logout() {
-  signOut(auth).then(() => window.location.href = 'index.html');
-}
-
-// Event listeners e controle de rota
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('btnLogin').addEventListener('click', login);
-  document.getElementById('btnRegistrar').addEventListener('click', registrar);
-  onAuthStateChanged(auth, user => {
-    if (window.location.pathname.includes('dashboard') && !user) {
-      window.location.href = 'index.html';
+
+  const emailEl      = document.getElementById('email');
+  const passEl       = document.getElementById('password');
+  const btnLogin     = document.getElementById('btnLogin');
+  const btnRegister  = document.getElementById('btnRegister');
+
+  /* garante login persistente */
+  setPersistence(auth, browserLocalPersistence);
+
+  /* --- LOGIN --- */
+  btnLogin.addEventListener('click', async (e) => {
+    e.preventDefault();
+    try {
+      await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
+      window.location.href = 'dashboard.html';
+    } catch (err) {
+      alert('Erro no login: ' + err.message);
+    }
+  });
+
+  /* --- REGISTRO --- */
+  btnRegister.addEventListener('click', async (e) => {
+    e.preventDefault();
+    try {
+      const cred = await createUserWithEmailAndPassword(
+        auth,
+        emailEl.value.trim(),
+        passEl.value
+      );
+
+      /* cria documento base no Firestore */
+      await setDoc(doc(db, 'progresso', cred.user.uid), {
+        email: cred.user.email,
+        assistidos: [],
+        categorias_concluidas: [],
+        certificado_emitido: false
+      });
+
+      window.location.href = 'dashboard.html';
+    } catch (err) {
+      alert('Erro no cadastro: ' + err.message);
     }
   });
 });
-```
