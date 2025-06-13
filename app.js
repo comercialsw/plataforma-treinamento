@@ -1,10 +1,15 @@
 ```javascript
-import { auth } from './firebase-init.js';
+import { auth, db } from './firebase-init.js';
 import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
-  signOut
+  signOut,
+  createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  doc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 window.login = function () {
   const email = document.getElementById("email").value;
@@ -17,6 +22,26 @@ window.login = function () {
     .catch(() => {
       erro.innerText = "Credenciais inválidas";
     });
+};
+
+window.registrar = async function () {
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
+  const erro = document.getElementById("erro");
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
+    const uid = userCredential.user.uid;
+    await setDoc(doc(db, "progresso", uid), {
+      email: email,
+      assistidos: [],
+      categorias_concluidas: [],
+      certificado_emitido: false,
+      data_certificado: null
+    });
+    window.location.href = "dashboard.html";
+  } catch (e) {
+    erro.innerText = "Erro ao registrar: " + e.message;
+  }
 };
 
 window.logout = function () {
