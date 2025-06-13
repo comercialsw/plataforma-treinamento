@@ -14,73 +14,81 @@
     <input id="email"    type="email"    placeholder="E-mail" required />
     <input id="password" type="password" placeholder="Senha" required />
 
-    <button onclick="login()">Entrar</button>
-    <button onclick="register()" class="outline">Primeiro acesso</button>
+    <button id="btnLogin">Entrar</button>
+    <button id="btnRegister" class="outline">Primeiro acesso</button>
     <p id="error" class="error"></p>
   </div>
 
   <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js';
-    import {
-      getAuth,
-      setPersistence,
-      browserLocalPersistence,
-      signInWithEmailAndPassword,
-      createUserWithEmailAndPassword
-    } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
-    import {
-      getFirestore,
-      doc,
-      setDoc
-    } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js';
+    /* 1) IMPORTS – SDK 11.27.0 ----------------------------------- */
+    import { initializeApp }               from 'https://www.gstatic.com/firebasejs/11.27.0/firebase-app.js';
+    import { getAuth,
+             setPersistence,
+             browserLocalPersistence,
+             signInWithEmailAndPassword,
+             createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.27.0/firebase-auth.js';
+    import { initializeFirestore,
+             doc, setDoc }                 from 'https://www.gstatic.com/firebasejs/11.27.0/firebase-firestore.js';
 
+    /* 2) CONFIGURAÇÃO (substitua pelos seus valores) ------------- */
     const firebaseConfig = {
-      apiKey:            'AIzaSyCTJ1qxAmxW8tksXBi8hFLchSnuvSAYQfY',
-      authDomain:        'smartway-treinamentos.firebaseapp.com',
-      projectId:         'smartway-treinamentos',
-      storageBucket:     'smartway-treinamentos.appspot.com',
-      messagingSenderId: '389500401009',
-      appId:             '1:389500401009:web:22182df458fc133cc072d0'
+      apiKey:            'SUA_API_KEY',
+      authDomain:        'SEU_PROJETO.firebaseapp.com',
+      projectId:         'SEU_PROJETO',
+      storageBucket:     'SEU_PROJETO.appspot.com',
+      messagingSenderId: 'SEU_SENDER_ID',
+      appId:             'SEU_APP_ID',
+      databaseURL:       'https://SEU_PROJETO-default-rtdb.firebaseio.com'
     };
 
-    // Inicializa
+    /* 3) INICIALIZAÇÃO ------------------------------------------ */
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db   = getFirestore(app);
+    const db   = initializeFirestore(app, { experimentalForceLongPolling: true });
 
-    // Persistência local
-    setPersistence(auth, browserLocalPersistence);
+    /* 4) Persistência local -------------------------------------- */
+    setPersistence(auth, browserLocalPersistence).catch(console.error);
 
-    // Funções expostas para os botões
-    window.login = async () => {
-      const errEl = document.getElementById('error'); errEl.textContent = '';
+    /* 5) Elementos ------------------------------------------------ */
+    const emailEl   = document.getElementById('email');
+    const passEl    = document.getElementById('password');
+    const btnLogin  = document.getElementById('btnLogin');
+    const btnReg    = document.getElementById('btnRegister');
+    const errorEl   = document.getElementById('error');
+
+    /* 6) Login ---------------------------------------------------- */
+    btnLogin.addEventListener('click', async () => {
+      errorEl.textContent = '';
       try {
-        await signInWithEmailAndPassword(
-          auth,
-          document.getElementById('email').value.trim(),
-          document.getElementById('password').value
-        );
+        await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
         window.location.href = 'dashboard.html';
       } catch (e) {
-        errEl.textContent = 'Usuário ou senha inválidos.';
+        errorEl.textContent = 'Usuário ou senha inválidos.';
+        console.error(e);
       }
-    };
+    });
 
-    window.register = async () => {
-      const errEl = document.getElementById('error'); errEl.textContent = '';
-      const email = document.getElementById('email').value.trim();
-      const pwd   = document.getElementById('password').value;
-      if (!email || !pwd) { errEl.textContent = 'Preencha e-mail e senha.'; return; }
+    /* 7) Registro ------------------------------------------------- */
+    btnReg.addEventListener('click', async () => {
+      errorEl.textContent = '';
+      const email = emailEl.value.trim();
+      const pwd   = passEl.value;
+      if (!email || !pwd) { errorEl.textContent = 'Preencha e-mail e senha.'; return; }
+
       try {
         const cred = await createUserWithEmailAndPassword(auth, email, pwd);
         await setDoc(doc(db, 'progresso', cred.user.uid), {
-          email, assistidos: [], categorias_concluidas: [], certificado_emitido: false
+          email,
+          assistidos: [],
+          categorias_concluidas: [],
+          certificado_emitido: false
         });
         window.location.href = 'dashboard.html';
       } catch (e) {
-        errEl.textContent = 'Erro no cadastro: ' + e.message;
+        errorEl.textContent = 'Erro no cadastro: ' + e.message;
+        console.error(e);
       }
-    };
+    });
   </script>
 </body>
 </html>
