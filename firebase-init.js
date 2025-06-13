@@ -1,4 +1,3 @@
-```javascript
 /* firebase-init.js */
 import { initializeApp }    from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js';
 import { getAuth }          from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
@@ -16,4 +15,3 @@ const firebaseConfig = {
 const app  = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db   = getFirestore(app);
-```
