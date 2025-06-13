@@ -1,9 +1,5 @@
-/* app.js -----------------------------------------------------------
- * - SDK atualizado para 11.27.0
- * - Imports consistentes (não reinicializa Firebase aqui)
- * - Persistência tratada com promessa
- * ----------------------------------------------------------------- */
-
+/* app.js --------------------------------------------------------- */
+/*  SDK 11.9.1                                                     */
 import { auth, db } from './firebase-init.js';
 
 import {
@@ -12,69 +8,58 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
-  signOut           // se não usar, pode remover este import
-} from 'https://www.gstatic.com/firebasejs/11.27.0/firebase-auth.js';
+  signOut
+} from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
 
 import {
-  doc,
-  setDoc
-} from 'https://www.gstatic.com/firebasejs/11.27.0/firebase-firestore.js';
+  doc, setDoc
+} from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js';
 
-/* 1) Persistência de login (localStorage) */
+/* Persistência local */
 setPersistence(auth, browserLocalPersistence).catch(console.error);
 
-/* 2) Elementos do DOM */
+/* DOM */
 const emailEl     = document.getElementById('email');
 const passEl      = document.getElementById('password');
 const btnLogin    = document.getElementById('btnLogin');
 const btnRegister = document.getElementById('btnRegister');
 const errorEl     = document.getElementById('error');
 
-/* 3) Função de login */
-btnLogin.addEventListener('click', async () => {
+/* Login */
+window.login = async () => {
   errorEl.textContent = '';
   try {
     await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
     window.location.href = 'dashboard.html';
-  } catch (e) {
+  } catch {
     errorEl.textContent = 'Usuário ou senha inválidos.';
-    console.error(e);
   }
-});
+};
 
-/* 4) Função de registro */
-btnRegister.addEventListener('click', async () => {
+/* Registro */
+window.register = async () => {
   errorEl.textContent = '';
-  if (!emailEl.value || !passEl.value) {
-    errorEl.textContent = 'Preencha e-mail e senha.';
-    return;
-  }
-  try {
-    const cred = await createUserWithEmailAndPassword(
-      auth,
-      emailEl.value.trim(),
-      passEl.value
-    );
+  const email = emailEl.value.trim();
+  const pwd   = passEl.value;
+  if (!email || !pwd) { errorEl.textContent = 'Preencha e-mail e senha.'; return; }
 
-    // cria documento inicial de progresso
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pwd);
     await setDoc(doc(db, 'progresso', cred.user.uid), {
-      email: cred.user.email,
+      email,
       assistidos: [],
       categorias_concluidas: [],
       certificado_emitido: false
     });
-
     window.location.href = 'dashboard.html';
   } catch (e) {
     errorEl.textContent = 'Erro no cadastro: ' + e.message;
-    console.error(e);
   }
-});
+};
 
-/* 5) Proteção de rota: dashboard requer usuário autenticado */
+/* Proteção de rota */
 onAuthStateChanged(auth, user => {
-  const inDashboard = window.location.pathname.includes('dashboard');
-  if (inDashboard && !user) {
+  if (window.location.pathname.includes('dashboard') && !user) {
     window.location.replace('index.html');
   }
 });
