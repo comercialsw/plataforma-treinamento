@@ -11,8 +11,8 @@ import {
 } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js';
 
 const videos = [
-  { id: 'XxVg_s8xAms', titulo: 'Segurança', categoria: 'Apresentação Modelos' },
-  { id: 'dQw4w9WgXcQ', titulo: 'Dicas', categoria: 'Dicas Smartway' }
+  { id: '4dkCJjV0d6Y', titulo: 'Segurança', categoria: 'Apresentação Modelos' },
+  { id: 'IbthtipprPs', titulo: 'Dicas', categoria: 'Dicas Smartway' }
 ];
 
 const container       = document.getElementById('video-container');
