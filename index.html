@@ -1,20 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-  <script src="app.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartWay | Acesso</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <form id="login-form">
-    <div class="login">
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required>
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required>
-      <button type="submit">Submit</button>
-    </div>
-  </form>
+  <div class="login-container">
+    <img src="logo-smartway.jpg" class="logo" alt="Logo SmartWay">
+    <h2>Acesso à Plataforma</h2>
+    <input id="email"    type="email"    placeholder="E-mail">
+    <input id="password" type="password" placeholder="Senha">
+    <!-- inline onclick agora aponta a funções garantidas no window -->
+    <button onclick="login()">Entrar</button>
+    <button onclick="register()">Primeiro acesso</button>
+    <p id="error" class="error"></p>
+  </div>
+
+  <!-- EMBED DO MÓDULO AQUI MESMO, PARA GARANTIR window.login / window.register -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import {
+      getAuth,
+      setPersistence,
+      browserLocalPersistence,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+    // ** Atenção: storageBucket deve terminar em .appspot.com **
+    const firebaseConfig = {
+      apiKey:            "AIzaSyCTJ1qxAmxW8tksXBi8hFLchSnuvSAYQfY",
+      authDomain:        "smartway-treinamentos.firebaseapp.com",
+      projectId:         "smartway-treinamentos",
+      storageBucket:     "smartway-treinamentos.appspot.com",
+      messagingSenderId: "389500401009",
+      appId:             "1:389500401009:web:22182df458fc133cc072d0"
+    };
+
+    // inicializa Firebase
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    // login persistente
+    setPersistence(auth, browserLocalPersistence);
+
+    // expõe as funções no window
+    window.login = async function() {
+      const email = document.getElementById("email").value.trim();
+      const pwd   = document.getElementById("password").value;
+      const err   = document.getElementById("error");
+      err.textContent = "";
+      try {
+        await signInWithEmailAndPassword(auth, email, pwd);
+        window.location.href = "dashboard.html";
+      } catch (e) {
+        err.textContent = "Usuário ou senha inválidos.";
+      }
+    };
+
+    window.register = async function() {
+      const email = document.getElementById("email").value.trim();
+      const pwd   = document.getElementById("password").value;
+      const err   = document.getElementById("error");
+      err.textContent = "";
+      if (!email || !pwd) {
+        err.textContent = "Preencha e-mail e senha.";
+        return;
+      }
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, pwd);
+        await setDoc(doc(db, "progresso", cred.user.uid), {
+          email:                cred.user.email,
+          assistidos:           [],
+          categorias_concluidas: [],
+          certificado_emitido:  false
+        });
+        window.location.href = "dashboard.html";
+      } catch (e) {
+        err.textContent = "Erro no cadastro: " + e.message;
+      }
+    };
+  </script>
 </body>
 </html>
