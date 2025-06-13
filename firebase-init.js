@@ -1,11 +1,10 @@
 /* firebase-init.js ---------------------------------------------- */
-/*  SDK 11.27.0 + long-polling  ---------------------------------- */
+/*  SDK 11.9.1 + long-polling  ------------------------------------ */
+import { initializeApp }       from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js';
+import { getAuth }             from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
+import { initializeFirestore } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js';
 
-import { initializeApp }       from 'https://www.gstatic.com/firebasejs/11.27.0/firebase-app.js';
-import { getAuth }             from 'https://www.gstatic.com/firebasejs/11.27.0/firebase-auth.js';
-import { initializeFirestore } from 'https://www.gstatic.com/firebasejs/11.27.0/firebase-firestore.js';
-
-/* — Configuração do projeto (substitua pelos seus valores) — */
+/* — Configuração do projeto — (mantenha seus valores reais) */
 const firebaseConfig = {
   apiKey:            'AIzaSyCTJ1qxAmxW8tksXBi8hFLchSnuvSAYQfY',
   authDomain:        'smartway-treinamentos.firebaseapp.com',
@@ -19,7 +18,4 @@ const firebaseConfig = {
 /* — Inicialização — */
 const app  = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-
-/* Força long-polling → evita erro 400 em hosts estáticos (GitHub Pages) */
 export const db   = initializeFirestore(app, { experimentalForceLongPolling: true });
-
