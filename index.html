@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SmartWay | Login</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -12,89 +12,14 @@
     <h2>Acesso à Plataforma</h2>
 
     <input id="email"    type="email"    placeholder="E-mail" required />
-    <input id="password" type="password" placeholder="Senha" required />
+    <input id="password" type="password" placeholder="Senha"  required />
 
-    <!--  ⬇️ mantém onclick para quem é leigo ficar simples -->
     <button onclick="login()">Entrar</button>
     <button onclick="register()" class="outline">Primeiro acesso</button>
 
     <p id="error" class="error"></p>
   </div>
 
-  <!-- Firebase + lógica ------------------------------------------------>
- <script type="module">
-  import { initializeApp } from
-    'https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js';
-  import {
-    getAuth,
-    setPersistence, browserLocalPersistence,
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword
-  } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
-  import {
-    initializeFirestore,
-    doc, setDoc
-  } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js';
-
-    /* 2) CONFIG DO SEU PROJETO (os mesmos dados que já usava) */
-    const firebaseConfig = {
-      apiKey:            'AIzaSyCTJ1qxAmxW8tksXBi8hFLchSnuvSAYQfY',
-      authDomain:        'smartway-treinamentos.firebaseapp.com',
-      projectId:         'smartway-treinamentos',
-      storageBucket:     'smartway-treinamentos.appspot.com',
-      messagingSenderId: '389500401009',
-      appId:             '1:389500401009:web:22182df458fc133cc072d0',
-      databaseURL:       'https://smartway-treinamentos-default-rtdb.firebaseio.com'
-    };
-
-    /* 3) INICIALIZA */
-    const app  = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db   = initializeFirestore(app, { experimentalForceLongPolling: true });
-
-    /* 4) Persistência local */
-    setPersistence(auth, browserLocalPersistence).catch(console.error);
-
-    /* 5) Referências de DOM */
-    const emailEl = document.getElementById('email');
-    const passEl  = document.getElementById('password');
-    const errEl   = document.getElementById('error');
-
-    /* 6) FUNÇÃO GLOBAL login() – chamada pelo onclick */
-    window.login = async () => {
-      errEl.textContent = '';
-      try {
-        await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
-        window.location.href = 'dashboard.html';
-      } catch (e) {
-        errEl.textContent = 'Usuário ou senha inválidos.';
-        console.error(e);
-      }
-    };
-
-    /* 7) FUNÇÃO GLOBAL register() – chamada pelo onclick */
-    window.register = async () => {
-      errEl.textContent = '';
-      const email = emailEl.value.trim();
-      const pwd   = passEl.value;
-      if (!email || !pwd) {
-        errEl.textContent = 'Preencha e-mail e senha.';
-        return;
-      }
-      try {
-        const cred = await createUserWithEmailAndPassword(auth, email, pwd);
-        await setDoc(doc(db, 'progresso', cred.user.uid), {
-          email,
-          assistidos: [],
-          categorias_concluidas: [],
-          certificado_emitido: false
-        });
-        window.location.href = 'dashboard.html';
-      } catch (e) {
-        errEl.textContent = 'Erro no cadastro: ' + e.message;
-        console.error(e);
-      }
-    };
-  </script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
