@@ -5,9 +5,6 @@ body {
   background-color: #f5f6fa;
 }
 .login-container {
-  display: block;
-  width: 100%;
-  margin: 10px 0;
   max-width: 400px;
   margin: 10vh auto;
   background: white;
@@ -28,15 +25,28 @@ input {
   border: 1px solid #ccc;
   border-radius: 5px;
 }
-button {
+.login-container button {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
   background-color: #f4511e;
   color: white;
   padding: 10px;
-  width: 100%;
   border: none;
   border-radius: 5px;
   font-weight: bold;
   cursor: pointer;
+}
+.login-container .btn-secundario {
+  background-color: #ecf0f1;
+  color: #2c3e50;
+}
+.login-container .btn-secundario:hover {
+  background-color: #d0d3d4;
+}
+.erro {
+  color: red;
+  margin-top: 10px;
 }
 .topbar {
   background-color: white;
