@@ -5,6 +5,9 @@ body {
   background-color: #f5f6fa;
 }
 .login-container {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
   max-width: 400px;
   margin: 10vh auto;
   background: white;
