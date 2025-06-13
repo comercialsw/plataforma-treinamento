@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plataforma de Treinamentos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      background-color: #f8f9fa;
+    }
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 15px;
+      text-align: center;
+    }
+    .card img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    .card button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .card button:hover {
+      background-color: #2980b9;
+    }
+    .assistido {
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🎓 Plataforma de Treinamentos</h1>
+    <p>Assista aos vídeos educativos da empresa</p>
+  </header>
+
+  <div class="container" id="video-container">
+    <!-- Os vídeos serão inseridos aqui -->
+  </div>
+
+  <script>
+    const videos = [
+      {
+        id: "XxVg_s8xAms",
+        titulo: "Treinamento de Segurança",
+        capa: "https://img.youtube.com/vi/XxVg_s8xAms/0.jpg"
+      },
+      {
+        id: "dQw4w9WgXcQ",
+        titulo: "Boas Práticas no Escritório",
+        capa: "https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg"
+      }
+    ];
+
+    const container = document.getElementById("video-container");
+
+    videos.forEach((video, index) => {
+      const assistidoKey = `assistido_${video.id}`;
+      const assistido = localStorage.getItem(assistidoKey);
+
+      const card = document.createElement("div");
+      card.className = "card";
+
+      card.innerHTML = `
+        <img src="${video.capa}" alt="${video.titulo}">
+        <h3>${video.titulo}</h3>
+        <button onclick="window.open('https://youtube.com/watch?v=${video.id}', '_blank')">Assistir</button>
+        <br/><br/>
+        <button onclick="marcarAssistido('${assistidoKey}', this)">✅ Marcar como assistido</button>
+        <p id="${assistidoKey}_status" class="assistido" style="display:${assistido ? 'block' : 'none'}">&#10004; Assistido</p>
+      `;
+
+      container.appendChild(card);
+    });
+
+    function marcarAssistido(chave, botao) {
+      localStorage.setItem(chave, "true");
+      document.getElementById(chave + "_status").style.display = "block";
+    }
+  </script>
+</body>
+</html>
