@@ -1,4 +1,3 @@
-```javascript
 /* app.js */
 import { auth, db } from './firebase-init.js';
 import {
@@ -63,4 +62,3 @@ onAuthStateChanged(auth, user => {
     window.location.replace('index.html');
   }
 });
-```
