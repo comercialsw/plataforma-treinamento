@@ -2,92 +2,100 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SmartWay | Acesso</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartWay | Login</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="login-container">
-    <img src="logo-smartway.jpg" class="logo" alt="Logo SmartWay">
+    <img src="logo-smartway.jpg" alt="Logo SmartWay" class="logo" />
     <h2>Acesso à Plataforma</h2>
-    <input id="email"    type="email"    placeholder="E-mail">
-    <input id="password" type="password" placeholder="Senha">
-    <!-- inline onclick agora aponta a funções garantidas no window -->
+
+    <input id="email"    type="email"    placeholder="E-mail" required />
+    <input id="password" type="password" placeholder="Senha" required />
+
     <button onclick="login()">Entrar</button>
-    <button onclick="register()">Primeiro acesso</button>
+    <button onclick="register()" class="outline">Primeiro acesso</button>
     <p id="error" class="error"></p>
   </div>
 
-  <!-- EMBED DO MÓDULO AQUI MESMO, PARA GARANTIR window.login / window.register -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js';
     import {
       getAuth,
       setPersistence,
       browserLocalPersistence,
       signInWithEmailAndPassword,
-      createUserWithEmailAndPassword
-    } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+      createUserWithEmailAndPassword,
+      onAuthStateChanged
+    } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
     import {
       getFirestore,
       doc,
       setDoc
-    } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+    } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js';
 
-    // ** Atenção: storageBucket deve terminar em .appspot.com **
+    // Config Firebase
     const firebaseConfig = {
-      apiKey:            "AIzaSyCTJ1qxAmxW8tksXBi8hFLchSnuvSAYQfY",
-      authDomain:        "smartway-treinamentos.firebaseapp.com",
-      projectId:         "smartway-treinamentos",
-      storageBucket:     "smartway-treinamentos.appspot.com",
-      messagingSenderId: "389500401009",
-      appId:             "1:389500401009:web:22182df458fc133cc072d0"
+      apiKey:            'AIzaSyCTJ1qxAmxW8tksXBi8hFLchSnuvSAYQfY',
+      authDomain:        'smartway-treinamentos.firebaseapp.com',
+      projectId:         'smartway-treinamentos',
+      storageBucket:     'smartway-treinamentos.appspot.com',
+      messagingSenderId: '389500401009',
+      appId:             '1:389500401009:web:22182df458fc133cc072d0'
     };
 
-    // inicializa Firebase
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db   = getFirestore(app);
 
-    // login persistente
+    // Persistência de sessão
     setPersistence(auth, browserLocalPersistence);
 
-    // expõe as funções no window
-    window.login = async function() {
-      const email = document.getElementById("email").value.trim();
-      const pwd   = document.getElementById("password").value;
-      const err   = document.getElementById("error");
-      err.textContent = "";
+    // Expor funções globalmente
+    window.login = async () => {
+      const errEl = document.getElementById('error');
+      errEl.textContent = '';
       try {
-        await signInWithEmailAndPassword(auth, email, pwd);
-        window.location.href = "dashboard.html";
+        await signInWithEmailAndPassword(
+          auth,
+          document.getElementById('email').value.trim(),
+          document.getElementById('password').value
+        );
+        window.location.href = 'dashboard.html';
       } catch (e) {
-        err.textContent = "Usuário ou senha inválidos.";
+        errEl.textContent = 'Usuário ou senha inválidos.';
       }
     };
 
-    window.register = async function() {
-      const email = document.getElementById("email").value.trim();
-      const pwd   = document.getElementById("password").value;
-      const err   = document.getElementById("error");
-      err.textContent = "";
+    window.register = async () => {
+      const errEl = document.getElementById('error');
+      errEl.textContent = '';
+      const email = document.getElementById('email').value.trim();
+      const pwd   = document.getElementById('password').value;
       if (!email || !pwd) {
-        err.textContent = "Preencha e-mail e senha.";
+        errEl.textContent = 'Preencha e-mail e senha.';
         return;
       }
       try {
         const cred = await createUserWithEmailAndPassword(auth, email, pwd);
-        await setDoc(doc(db, "progresso", cred.user.uid), {
+        await setDoc(doc(db, 'progresso', cred.user.uid), {
           email:                cred.user.email,
           assistidos:           [],
           categorias_concluidas: [],
-          certificado_emitido:  false
+          certificado_emitido:  false,
+          data_certificado:     null
         });
-        window.location.href = "dashboard.html";
+        window.location.href = 'dashboard.html';
       } catch (e) {
-        err.textContent = "Erro no cadastro: " + e.message;
+        errEl.textContent = 'Erro no cadastro: ' + e.message;
       }
     };
+
+    // Se já está logado, ir direto ao dashboard
+    onAuthStateChanged(auth, user => {
+      if (user) window.location.replace('dashboard.html');
+    });
   </script>
 </body>
 </html>
