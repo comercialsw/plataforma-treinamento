@@ -1,4 +1,3 @@
-```javascript
 /* videos.js */
 import { auth, db } from './firebase-init.js';
 import {
@@ -76,4 +75,3 @@ window.marcar = async (videoId, btn) => {
   btn.textContent = '✔ Já assistido';
   btn.disabled = true;
 };
-```
