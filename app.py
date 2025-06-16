@@ -43,6 +43,8 @@ logo_col, title_col = st.columns([1, 3])
 logo_col.image("logo-smartway.jpg", width=150)
 title_col.markdown("## **SmartWay – Plataforma de Vídeos**")
 
+EMAIL_ADMIN = "comercial@smartwaybr.com.br"
+
 # LOGIN / REGISTRO LOCAL
 if st.session_state.user is None or not isinstance(st.session_state.user, str):
     aba = st.tabs(["Entrar", "Primeiro acesso"])
@@ -77,10 +79,6 @@ if st.session_state.user is None or not isinstance(st.session_state.user, str):
                 st.session_state.user = email_r.strip()  # sempre string
                 st.success("Cadastro realizado! Redirecionando…")
                 st.rerun()
-
-# DASHBOARD LOCAL
-
-MAIL_ADMIN = "comercial@smartwaybr.com.br"
 
 else:
     usuario = st.session_state.user.strip()  # sempre string, sem espaços
