@@ -79,6 +79,27 @@ if st.session_state.user is None or not isinstance(st.session_state.user, str):
                 st.rerun()
 
 # DASHBOARD LOCAL
+
+EMAIL_ADMIN = "comercial@smartwaybr.com.br"
+
+elif isinstance(st.session_state.user, str):
+    usuario = st.session_state.user.strip()
+
+    with st.sidebar:
+        st.markdown(f"### 👤 {usuario}")
+        if st.button("Sair"):
+            st.session_state.user = None
+            st.rerun()
+
+        # PAINEL DE ADMINISTRAÇÃO (visível só para o admin)
+        if usuario == EMAIL_ADMIN:
+            st.markdown("---")
+            st.markdown("## Painel de Administração")
+            if st.button("Ver usuários cadastrados"):
+                st.json(ler_usuarios())
+            if st.button("Ver progresso de todos os usuários"):
+                st.json(ler_progresso())
+
 elif isinstance(st.session_state.user, str):
     usuario = st.session_state.user.strip()  # sempre string, sem espaços
 
