@@ -2,6 +2,7 @@ import streamlit as st
 import json
 from typing import List, Dict
 from pathlib import Path
+import pandas as pd
 
 # Arquivos locais
 CAMINHO_PROG = Path("progresso.json")
@@ -90,11 +91,10 @@ else:
             st.rerun()
 
         # PAINEL DE ADMINISTRAÇÃO (visível só para o admin)
-        import pandas as pd
-
-if usuario == EMAIL_ADMIN:
-    st.markdown("---")
-    st.markdown("## Painel de Administração")
+        
+    if usuario == EMAIL_ADMIN:
+        st.markdown("---")
+        st.markdown("## Painel de Administração")
     
     with st.expander("👥 Ver usuários cadastrados"):
         usuarios_dict = ler_usuarios()
