@@ -90,13 +90,26 @@ else:
             st.rerun()
 
         # PAINEL DE ADMINISTRAÇÃO (visível só para o admin)
-        if usuario == EMAIL_ADMIN:
-            st.markdown("---")
-            st.markdown("## Painel de Administração")
-            st.markdown("### Usuários cadastrados")
-            st.json(ler_usuarios())
-            st.markdown("### Progresso de todos os usuários")
-            st.json(ler_progresso())
+        import pandas as pd
+
+if usuario == EMAIL_ADMIN:
+    st.markdown("---")
+    st.markdown("## Painel de Administração")
+    
+    with st.expander("👥 Ver usuários cadastrados"):
+        usuarios_dict = ler_usuarios()
+        # Exibe só os e-mails, sem senhas (ou, se quiser mostrar a senha, mantenha a coluna)
+        usuarios_df = pd.DataFrame(list(usuarios_dict.items()), columns=["E-mail", "Senha"])
+        st.table(usuarios_df)
+    
+    with st.expander("📈 Ver progresso de todos os usuários"):
+        progresso_dict = ler_progresso()
+        # Transforma o progresso em tabela para visualização
+        progresso_lista = []
+        for user, vids in progresso_dict.items():
+            progresso_lista.append({"Usuário": user, "Vídeos assistidos": ", ".join(vids)})
+        progresso_df = pd.DataFrame(progresso_lista)
+        st.table(progresso_df)
 
     # Dashboard normal para todos os usuários
     dados = ler_progresso()
