@@ -80,10 +80,10 @@ if st.session_state.user is None or not isinstance(st.session_state.user, str):
 
 # DASHBOARD LOCAL
 
-EMAIL_ADMIN = "comercial@smartwaybr.com.br"
+MAIL_ADMIN = "comercial@smartwaybr.com.br"
 
-elif isinstance(st.session_state.user, str):
-    usuario = st.session_state.user.strip()
+else:
+    usuario = st.session_state.user.strip()  # sempre string, sem espaços
 
     with st.sidebar:
         st.markdown(f"### 👤 {usuario}")
@@ -95,21 +95,12 @@ elif isinstance(st.session_state.user, str):
         if usuario == EMAIL_ADMIN:
             st.markdown("---")
             st.markdown("## Painel de Administração")
-            if st.button("Ver usuários cadastrados"):
-                st.json(ler_usuarios())
-            if st.button("Ver progresso de todos os usuários"):
-                st.json(ler_progresso())
+            st.markdown("### Usuários cadastrados")
+            st.json(ler_usuarios())
+            st.markdown("### Progresso de todos os usuários")
+            st.json(ler_progresso())
 
-elif isinstance(st.session_state.user, str):
-    usuario = st.session_state.user.strip()  # sempre string, sem espaços
-
-    # Barra lateral – Logout
-    with st.sidebar:
-        st.markdown(f"### 👤 {usuario}")
-        if st.button("Sair"):
-            st.session_state.user = None
-            st.rerun()
-
+    # Dashboard normal para todos os usuários
     dados = ler_progresso()
     assistidos = dados.get(usuario, [])
 
