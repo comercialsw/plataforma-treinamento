@@ -4,10 +4,16 @@ from typing import List, Dict
 from pathlib import Path
 import pandas as pd
 
+# ──────────────────────────────
 # Arquivos locais
-CAMINHO_PROG = Path("progresso.json")
-CAMINHO_USERS = Path("usuarios.json")
+# ──────────────────────────────
+CAMINHO_PROG   = Path("progresso.json")
+CAMINHO_USERS  = Path("usuarios.json")
+CAMINHO_VIDEOS = Path("videos.csv")      
 
+# ──────────────────────────────
+# Funções utilitárias
+# ──────────────────────────────
 def ler_progresso() -> Dict[str, List[str]]:
     if CAMINHO_PROG.exists():
         with open(CAMINHO_PROG, "r", encoding="utf-8") as f:
@@ -28,25 +34,46 @@ def salvar_usuarios(dados: Dict[str, str]):
     with open(CAMINHO_USERS, "w", encoding="utf-8") as f:
         json.dump(dados, f, indent=2, ensure_ascii=False)
 
-# Lista fixa de vídeos
-videos: List[Dict[str, str]] = [
-    {"id": "4dkCJjV0d6Y", "titulo": "Segurança", "categoria": "Apresentação Modelos"},
-    {"id": "IbthtipprPs", "titulo": "Dicas", "categoria": "Dicas Smartway"},
-]
+def ler_videos() -> List[Dict[str, str]]:
+    """
+    Lê o CSV `videos.csv` e devolve uma lista de dicionários:
+    [{id: str, titulo: str, categoria: str}, ...]
+    """
+    if not CAMINHO_VIDEOS.exists():
+        st.error(f"Arquivo {CAMINHO_VIDEOS} não encontrado no repositório.")
+        return []
+    try:
+        df = pd.read_csv(CAMINHO_VIDEOS, dtype=str).fillna("")
+        colunas_esperadas = {"id", "titulo", "categoria"}
+        if not colunas_esperadas.issubset(df.columns):
+            st.error(f"CSV deve conter as colunas {sorted(colunas_esperadas)}.")
+            return []
+        return df.to_dict(orient="records")
+    except Exception as e:
+        st.error(f"Falha ao ler {CAMINHO_VIDEOS}: {e}")
+        return []
 
+# ──────────────────────────────
+# Configuração da página
+# ──────────────────────────────
 st.set_page_config(page_title="SmartWay | Plataforma", page_icon="🛴", layout="wide")
 
 # Garante que o usuário é sempre uma string (e-mail) ou None
 if "user" not in st.session_state:
     st.session_state.user = None
 
+# ──────────────────────────────
+# Cabeçalho
+# ──────────────────────────────
 logo_col, title_col = st.columns([1, 3])
 logo_col.image("logo-smartway.jpg", width=150)
 title_col.markdown("## **SmartWay – Plataforma de Vídeos**")
 
 EMAIL_ADMIN = "comercial@smartwaybr.com.br"
 
-# LOGIN / REGISTRO LOCAL
+# ──────────────────────────────
+# BLOCO DE LOGIN / REGISTRO
+# ──────────────────────────────
 if st.session_state.user is None or not isinstance(st.session_state.user, str):
     aba = st.tabs(["Entrar", "Primeiro acesso"])
     usuarios = ler_usuarios()
@@ -58,7 +85,7 @@ if st.session_state.user is None or not isinstance(st.session_state.user, str):
         senha = st.text_input("Senha", type="password", key="login_pwd")
         if st.button("Entrar", key="btn_login"):
             if email in usuarios and usuarios[email] == senha:
-                st.session_state.user = email.strip()  # sempre string
+                st.session_state.user = email.strip()
                 st.rerun()
             else:
                 st.error("Usuário ou senha inválidos.")
@@ -77,48 +104,63 @@ if st.session_state.user is None or not isinstance(st.session_state.user, str):
             else:
                 usuarios[email_r.strip()] = pwd_r1
                 salvar_usuarios(usuarios)
-                st.session_state.user = email_r.strip()  # sempre string
+                st.session_state.user = email_r.strip()
                 st.success("Cadastro realizado! Redirecionando…")
                 st.rerun()
 
+# ──────────────────────────────
+# ÁREA LOGADA
+# ──────────────────────────────
 else:
-    usuario = st.session_state.user.strip()  # sempre string, sem espaços
+    usuario = st.session_state.user.strip()
 
+    # Sidebar
     with st.sidebar:
         st.markdown(f"### 👤 {usuario}")
         if st.button("Sair"):
             st.session_state.user = None
             st.rerun()
 
-        # PAINEL DE ADMINISTRAÇÃO (visível só para o admin)
-        
+    # Painel de administração (apenas para o admin)
     if usuario == EMAIL_ADMIN:
         st.markdown("---")
         st.markdown("## Painel de Administração")
-    
-    with st.expander("👥 Ver usuários cadastrados"):
-        usuarios_dict = ler_usuarios()
-        # Exibe só os e-mails, sem senhas (ou, se quiser mostrar a senha, mantenha a coluna)
-        usuarios_df = pd.DataFrame(list(usuarios_dict.items()), columns=["E-mail", "Senha"])
-        st.table(usuarios_df)
-    
-    with st.expander("📈 Ver progresso de todos os usuários"):
-        progresso_dict = ler_progresso()
-        # Transforma o progresso em tabela para visualização
-        progresso_lista = []
-        for user, vids in progresso_dict.items():
-            progresso_lista.append({"Usuário": user, "Vídeos assistidos": ", ".join(vids)})
-        progresso_df = pd.DataFrame(progresso_lista)
-        st.table(progresso_df)
 
-    # Dashboard normal para todos os usuários
-    dados = ler_progresso()
-    assistidos = dados.get(usuario, [])
+        with st.expander("👥 Ver usuários cadastrados"):
+            usuarios_df = pd.DataFrame(
+                list(ler_usuarios().items()), columns=["E-mail", "Senha"]
+            )
+            st.table(usuarios_df)
 
-    categorias = sorted({v["categoria"] for v in videos})
+        with st.expander("📈 Ver progresso de todos os usuários"):
+            progresso_dict = ler_progresso()
+            progresso_df = pd.DataFrame(
+                [
+                    {"Usuário": u, "Vídeos assistidos": ", ".join(vids)}
+                    for u, vids in progresso_dict.items()
+                ]
+            )
+            st.table(progresso_df)
+
+    # ──────────────────────────
+    # Dashboard principal
+    # ──────────────────────────
+    dados_progresso = ler_progresso()
+    assistidos = dados_progresso.get(usuario, [])
+
+    # Carrega vídeos do CSV
+    videos = ler_videos()
+
+    if not videos:
+        st.stop()  # interrompe a execução se não houver vídeos
+
+    categorias = sorted({v["categoria"] for v in videos if v["categoria"]})
     cat_sel = st.selectbox("Categoria", ["Todas"] + categorias)
 
-    lista = [v for v in videos if cat_sel == "Todas" or v["categoria"] == cat_sel]
+    lista = [
+        v for v in videos
+        if cat_sel == "Todas" or v["categoria"] == cat_sel
+    ]
 
     for v in lista:
         col1, col2 = st.columns([3, 1])
@@ -134,8 +176,8 @@ else:
                     try:
                         if v["id"] not in assistidos:
                             assistidos.append(v["id"])
-                            dados[usuario] = assistidos
-                            salvar_progresso(dados)
+                            dados_progresso[usuario] = assistidos
+                            salvar_progresso(dados_progresso)
                         st.success("Marcado!")
                         st.rerun()
                     except Exception as e:
