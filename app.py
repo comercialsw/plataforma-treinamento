@@ -67,7 +67,7 @@ if "user" not in st.session_state:
 # ──────────────────────────────
 logo_col, title_col = st.columns([1, 3])
 logo_col.image("logo-smartway.jpg", width=150)
-title_col.markdown("## **SmartWay – Plataforma de Vídeos**")
+title_col.markdown("## **Smartway – Plataforma de Vídeos**")
 
 EMAIL_ADMIN = "comercial@smartwaybr.com.br"
 
