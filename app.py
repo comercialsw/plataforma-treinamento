@@ -165,15 +165,15 @@ else:
 
 
     if cat_sel == "Apresentação Modelos" and subcat_sel and subcat_sel != "Todas":
-    lista = [
-        v for v in videos
-        if v["categoria"] == cat_sel and v.get("subcategoria", "") == subcat_sel
-    ]
-else:
-    lista = [
-        v for v in videos
-        if cat_sel == "Todas" or v["categoria"] == cat_sel
-    ]
+        lista = [
+            v for v in videos
+            if v["categoria"] == cat_sel and v.get("subcategoria", "") == subcat_sel
+        ]
+    else:
+        lista = [
+            v for v in videos
+            if cat_sel == "Todas" or v["categoria"] == cat_sel
+        ]
 
 
     for v in lista:
