@@ -156,12 +156,12 @@ else:
 
     categorias = sorted({v["categoria"] for v in videos if v["categoria"]})
     cat_sel = st.selectbox("Categoria", ["Todas"] + categorias)
-    
+
     # Define subcategorias apenas se a categoria for 'Apresentação Modelos'
     subcat_sel = None
     if cat_sel == "Apresentação Modelos":
         subcategorias = sorted({v.get("subcategoria", "") for v in videos if v["categoria"] == cat_sel and v.get("subcategoria")})
-        subcat_sel = st.selectbox("Subcategoria", ["Todas", "Veículo 2 rodas", "Triciclos"])
+        subcat_sel = st.selectbox("Subcategoria", ["Todas", "Veículo 2 Rodas", "Triciclos"])
 
 
     if cat_sel == "Apresentação Modelos" and subcat_sel and subcat_sel != "Todas":
@@ -169,10 +169,10 @@ else:
         v for v in videos
         if v["categoria"] == cat_sel and v.get("subcategoria", "") == subcat_sel
     ]
-    else:
-        lista = [
-            v for v in videos
-            if cat_sel == "Todas" or v["categoria"] == cat_sel
+else:
+    lista = [
+        v for v in videos
+        if cat_sel == "Todas" or v["categoria"] == cat_sel
     ]
 
 
